@@ -1,3 +1,5 @@
+package assignment07_28_08_2021;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,7 +18,7 @@ public class Assignment07_01 {
 
     @Before
     public void setup(){
-        System.setProperty("webdriver.gecko.driver", "E:\\RoadToSDET\\Projects\\Selenium\\src\\test\\resources\\geckodriver.exe");
+        System.setProperty("webdriver.gecko.driver", "src/test/resources/geckodriver.exe");
         FirefoxOptions ops=new FirefoxOptions();
         //ops.addArguments("--headed");
         ops.addArguments("--headless");//for not opening browser
