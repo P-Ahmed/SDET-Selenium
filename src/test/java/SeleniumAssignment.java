@@ -238,7 +238,7 @@ public class SeleniumAssignment {
     }
 
     @Test
-    public void readExcelFile() throws IOException {
+    public void ReadExcelFile() throws IOException {
         String filePath = ".\\src\\test\\resources";
         Utils.readFromExcel(filePath, "DemoFile.xls", "Sheet1");
     }

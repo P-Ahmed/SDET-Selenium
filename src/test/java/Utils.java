@@ -10,7 +10,7 @@ import java.io.IOException;
 public class Utils {
     public static void readFromExcel(String filePath,String fileName,String sheetName) throws
             IOException {
-        File file =    new File(filePath+"\\"+fileName);
+        File file = new File(filePath+"\\"+fileName);
         FileInputStream inputStream = new FileInputStream(file);
         Workbook workbook = null;
         String fileExtensionName = fileName.substring(fileName.indexOf("."));
