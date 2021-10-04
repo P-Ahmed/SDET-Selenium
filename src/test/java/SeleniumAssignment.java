@@ -1,19 +1,20 @@
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class SeleniumAssignment {
@@ -21,7 +22,7 @@ public class SeleniumAssignment {
     WebDriverWait wait;
 
     @Before
-    public void setup() {
+    public void Setup() {
         System.setProperty("webdriver.gecko.driver", "src/test/resources/geckodriver.exe");
         FirefoxOptions ops = new FirefoxOptions();
         ops.addArguments("--headed");
@@ -32,7 +33,7 @@ public class SeleniumAssignment {
     }
 
     @Test
-    public void getTitle() {
+    public void GetTitle() {
         driver.get("https://demoqa.com");
         String title = driver.getTitle();
         System.out.println(title);
@@ -40,7 +41,7 @@ public class SeleniumAssignment {
     }
 
     @Test
-    public void checkIfElementExists() throws InterruptedException {
+    public void CheckIfElementExists() throws InterruptedException {
         driver.get("https://demoqa.com");
         //Boolean status=wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//img[@src='/images/Toolsqa.jpg']"))).isDisplayed();
         Boolean status = driver.findElement(By.xpath("//img[@src='/images/Toolsqa.jpg']")).isDisplayed();
@@ -48,7 +49,7 @@ public class SeleniumAssignment {
     }
 
     @Test
-    public void writeOnTextBox() {
+    public void WriteOnTextBox() {
         driver.get("https://demoqa.com/elements");
         driver.findElement(By.xpath("//span[contains(text(),'Text Box')]")).click();
         driver.findElement(By.xpath("//input[@id='userName']")).click();
@@ -59,7 +60,7 @@ public class SeleniumAssignment {
     }
 
     @Test
-    public void clickOnButtonsFromMultipleElements() {
+    public void ClickOnButtonsFromMultipleElements() {
         driver.get("https://demoqa.com/buttons");
         Actions action = new Actions(driver);
         List<WebElement> list = driver.findElements(By.cssSelector("button"));
@@ -77,7 +78,7 @@ public class SeleniumAssignment {
     }
 
     @Test
-    public void dropdownSelection() {
+    public void DropdownSelection() {
         driver.get("https://demoqa.com/select-menu");
         Select color = new Select(driver.findElement(By.id("oldSelectMenu")));
         color.selectByValue("1");
@@ -89,7 +90,7 @@ public class SeleniumAssignment {
     }
 
     @Test
-    public void datePicker() {
+    public void DatePicker() {
         driver.get("https://demoqa.com/date-picker");
         driver.findElement(By.id("datePickerMonthYearInput")).clear();
         driver.findElement(By.id("datePickerMonthYearInput")).sendKeys("16/08/1995");
@@ -97,7 +98,7 @@ public class SeleniumAssignment {
     }
 
     @Test
-    public void handleAlert() throws InterruptedException {
+    public void HandleAlert() throws InterruptedException {
         driver.get("https://demoqa.com/alerts");
 //        driver.findElement(By.id("alertButton")).click();
 //        driver.switchTo().alert().accept();
@@ -112,7 +113,7 @@ public class SeleniumAssignment {
     }
 
     @Test
-    public void handleTabs() throws InterruptedException {
+    public void HandleTabs() throws InterruptedException {
         driver.get("https://demoqa.com/links");
         driver.findElement(By.id("simpleLink")).click();
         Thread.sleep(5000);
@@ -129,8 +130,121 @@ public class SeleniumAssignment {
         driver.switchTo().window(tabs.get(0));
     }
 
+    @Test
+    public void HandleMultipleWindow() {
+        driver.get("https://demoqa.com/browser-windows");
+        driver.findElement(By.id("windowButton")).click();
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("windowButton")));
+        String mainWindowHandle = driver.getWindowHandle();
+        Set<String> allWindowHandle = driver.getWindowHandles();
+        Iterator<String> iterator = allWindowHandle.iterator();
+
+        while (iterator.hasNext()) {
+            String childWindow = iterator.next();
+            if (!mainWindowHandle.equalsIgnoreCase(childWindow)) {
+                driver.switchTo().window(childWindow);
+                String text = driver.findElement(By.id("sampleHeading")).getText();
+                Assert.assertTrue(text.contains("This is a sample page"));
+            }
+        }
+    }
+
+    @Test
+    public void ModalDialog() {
+        driver.get("https://demoqa.com/modal-dialogs");
+        driver.findElement(By.id("showSmallModal")).click();
+        driver.findElement(By.id("closeSmallModal")).click();
+    }
+
+    @Test
+    public void WebTables() {
+        driver.get("https://demoqa.com/webtables");
+        driver.findElement(By.id("edit-record-1")).click();
+        driver.findElement(By.id("firstName")).clear();
+        driver.findElement(By.id("firstName")).sendKeys("Pollab");
+        driver.findElement(By.id("lastName")).clear();
+        driver.findElement(By.id("lastName")).sendKeys("Ahmed");
+        driver.findElement(By.id("submit")).click();
+    }
+
+    @Test
+    public void ScrapData() {
+        driver.get("https://demoqa.com/webtables");
+        WebElement table = driver.findElement(By.className("rt-tbody"));
+        List<WebElement> allRows = table.findElements(By.className("rt-tr"));
+        int i = 0;
+        for (WebElement row : allRows) {
+            List<WebElement> cells = row.findElements(By.className("rt-td"));
+            for (WebElement cell : cells) {
+                i++;
+                System.out.println("num[" + i + "] " + cell.getText());
+
+            }
+        }
+    }
+
+    @Test
+    public void UploadImage() {
+        driver.get("https://demoqa.com/upload-download");
+        driver.findElement(By.id("uploadFile")).sendKeys("D:\\Torrent\\Wallpaperswide.com\\4K\\3d_sun_system_2-wallpaper-3840x2160.jpg");
+        String text = driver.findElement(By.id("uploadedFilePath")).getText();
+        Assert.assertTrue(text.contains("3d_sun_system_2-wallpaper-3840x2160.jpg"));
+    }
+
+    @Test
+    public void HandleIFrame() {
+        driver.get("https://demoqa.com/frames");
+        driver.switchTo().frame("frame1");
+        String text = driver.findElement(By.id("sampleHeading")).getText();
+        Assert.assertTrue(text.contains("This is a sample page"));
+        driver.switchTo().defaultContent();
+    }
+
+    @Test
+    public void MouseHover() throws InterruptedException {
+        driver.get("https://green.edu.bd/");
+        WebElement mainMenu = driver.findElement(By.xpath("//a[@class='dropdown-toggle'][contains(text(),'About Us')]"));
+        Actions actions = new Actions(driver);
+        actions.moveToElement(mainMenu).perform();
+        Thread.sleep(3000);
+        WebElement subMenu = driver.findElement(By.xpath("//li[@id='menu-item-325']//a[contains(text(),'History')]"));
+        actions.moveToElement(subMenu);
+        actions.click().build().perform();
+    }
+
+    @Test
+    public void KeyboardEvent() throws InterruptedException {
+        driver.get("https://www.google.com/");
+        WebElement webElement = driver.findElement(By.name("q"));
+        Actions actions = new Actions(driver);
+        actions.moveToElement(webElement);
+        actions.keyDown(Keys.SHIFT)
+                .sendKeys("Selenium Webdriver")
+                .keyUp(Keys.SHIFT)
+                .sendKeys(Keys.ENTER)
+                .perform();
+        Thread.sleep(5000);
+    }
+
+    @Test
+    public void TakingScreenshot() throws IOException {
+        driver.get("https://demoqa.com/");
+        File screenshotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        String time = new SimpleDateFormat("dd-MM-yyyy-hh-mm-ss-aa").format(new Date());
+        String fileWithPath = "./src/test/resources/screenshots/" + time + ".png";
+        File destFile = new File(fileWithPath);
+        FileUtils.copyFile(screenshotFile, destFile);
+    }
+
+    @Test
+    public void readExcelFile() throws IOException {
+        String filePath = ".\\src\\test\\resources";
+        Utils.readFromExcel(filePath, "DemoFile.xls", "Sheet1");
+    }
+
     @After
-    public void finishTest() {
+    public void FinishTest() {
         driver.close();
     }
 }
